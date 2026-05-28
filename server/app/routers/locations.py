@@ -1,0 +1,2 @@
+# GET/locations
+# POST/locations
