@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from datetime import datetime, timezone, timedelta
-
 from app.models.crowd_report import CrowdReport
 from app.schemas.crowd_report import CrowdReportCreate
 
@@ -21,13 +20,13 @@ def create_crowd_report(
     db.refresh(report)
     return report
 
-def get_recent_report(
+def get_recent_reports(
     db: Session,
     location_id: str,
     within_minutes: int = 60
 ) -> list[CrowdReport]:
     cutoff = datetime.now(timezone.utc) - timedelta(minutes=within_minutes)
-    return(
+    return (
         db.query(CrowdReport)
         .filter(
             CrowdReport.location_id == location_id,

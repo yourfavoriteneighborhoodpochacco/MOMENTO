@@ -14,24 +14,23 @@ router = APIRouter(prefix="/crowd-reports", tags=["reports"])
     response_model=CrowdReportResponse,
     status_code=status.HTTP_201_CREATED
 )
-
 def submit_crowd_report(
     report_data: CrowdReportCreate,
     db: Session = Depends(get_db),
-    current_user = Depends(get_current_contributor)
+    current_user=Depends(get_current_contributor)
 ):
     if current_user.account_type != "contributor":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only contributs can submit crowd reports"
+            detail="Only contributors can submit crowd reports"
         )
-        
+
     report = create_crowd_report(
         db=db,
         report_data=report_data,
         user_id=str(current_user.id)
     )
-    
+
     recompute_score(db=db, location_id=str(report_data.location_id))
-    
+
     return report
