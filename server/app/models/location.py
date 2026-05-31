@@ -13,8 +13,11 @@ class Location(Base):
     name = Column(String, nullable=False)
     category = Column(String, nullable=False)
     coordinates = Column(Geometry("POINT", srid=4326), nullable=False)
-    capacity_estiamte = Column(Integer, nullable=False)
+    capacity_estimate = Column(Integer, nullable=False)
     parent_id = Column(UUID(as_uuid=True), nullable=True)
     admin_tag = Column(String, nullable=True)
     
-    coordinate = relationship("Coordinate", back_populates="locations")
+    crowd_reports = relationship("CrowdReport", back_populates="location")
+    availability_patterns = relationship("AvailabilityPattern", back_populates="location")
+    availability_scores = relationship("AvailabilityScore", back_populates="location")
+    saved_locations = relationship("SavedLocation", back_populates="location")

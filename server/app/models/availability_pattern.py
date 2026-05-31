@@ -9,7 +9,7 @@ class AvailabilityPattern(Base):
     __tablename__ = "availability_patterns"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    location_id = Column(UUID(as_uuid=True), ForeignKey("location.id"), nullable=False)
+    location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"), nullable=False)
     day_of_week = Column(Integer, nullable=False)
     hour = Column(Integer, nullable=False)
     base_score = Column(Float, nullable=False)

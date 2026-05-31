@@ -9,8 +9,8 @@ from app.db.base import Base
 class SavedLocation(Base):
     __tablename__ = "saved_locations"
     
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True, nullable=False)
-    location_id = Column(UUID(as_uuid=True), ForeignKey("location.id"), primary_key=True, nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True, nullable=False)
+    location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"), primary_key=True, nullable=False)
     saved_at = Column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc), nullable=False)
     
     user = relationship("User", back_populates="saved_locations")

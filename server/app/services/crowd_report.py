@@ -11,7 +11,7 @@ def create_crowd_report(
     user_id: str
 ) -> CrowdReport:
     report = CrowdReport(
-        location_id=report.data.location_id,
+        location_id=report_data.location_id,
         submitted_by=user_id,
         seated_count=report_data.seated_count,
         line_count=report_data.line_count

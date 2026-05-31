@@ -7,12 +7,12 @@ import uuid
 from app.db.base import Base
 
 class AvailabilityScore(Base):
-    __tablename__ = "availability_patterns"
+    __tablename__ = "availability_scores"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    location_id = Column(UUID(as_uuid=True), ForeignKey("location.id"), nullable=False)
+    location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"), nullable=False)
     score = Column(Float, nullable=False)
     label = Column(String, nullable=False)
-    computed_at = Column(DateTime(timezone=True), default = lambda: datetime(timezone.utc), nullable=False)
+    computed_at = Column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc), nullable=False)
     
     location = relationship("Location", back_populates="availability_patterns")

@@ -10,8 +10,8 @@ class CrowdReport(Base):
     __tablename__ = "crowd_reports"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    location_id = Column(UUID(as_uuid=True), ForeignKey("location.id"), nullable=False)
-    submitted_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"), nullable=False)
+    submitted_by = Column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
     seated_count = Column(Integer, nullable=False)
     line_count = Column(Integer, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc), nullable=False)

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, UUID4
+from typing import Optional
 from datetime import datetime
 
 class UserCreate(BaseModel):
@@ -18,9 +19,9 @@ class UserResponse(BaseModel):
     first_name: str
     username: str
     email: str
-    phone_number: str
+    phone_number: Optional[str] = None
     password_hash: str
-    profile_photo_url: str 
+    profile_photo_url: Optional[str] = None
     account_type: str
     status: str
     
@@ -30,4 +31,4 @@ class UserResponse(BaseModel):
     member_since: datetime
     
     class Config:
-        from_attributes: True
+        from_attributes = True

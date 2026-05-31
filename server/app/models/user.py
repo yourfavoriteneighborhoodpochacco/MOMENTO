@@ -7,7 +7,7 @@ import uuid
 from app.db.base import Base
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "user"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     first_name = Column(String, nullable=False)
@@ -20,9 +20,9 @@ class User(Base):
     status = Column(String, nullable=True)
     
     location = Column(String, nullable=True)
-    sms_notifications = Column(Boolean, nullable=False)
-    availability_alerts = Column(Boolean, nullable=False)
+    sms_notifications = Column(Boolean, nullable=False, default=False)
+    availability_alerts = Column(Boolean, nullable=False, default=False)
     member_since = Column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc), nullable=False)
     
-    crowd_reports = relationship("CrowdReport", back_populates="users")
-    saved_locations = relationship("SavedLocation", back_populates="users")
+    crowd_reports = relationship("CrowdReport", back_populates="user")
+    saved_locations = relationship("SavedLocation", back_populates="user")
