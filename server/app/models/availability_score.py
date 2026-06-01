@@ -15,4 +15,4 @@ class AvailabilityScore(Base):
     label = Column(String, nullable=False)
     computed_at = Column(DateTime(timezone=True), default = lambda: datetime.now(timezone.utc), nullable=False)
     
-    location = relationship("Location", back_populates="availability_patterns")
+    location = relationship("Location", back_populates="availability_scores")

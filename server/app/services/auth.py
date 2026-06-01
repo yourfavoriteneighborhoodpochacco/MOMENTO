@@ -8,10 +8,14 @@ from app.db.session import get_db
 from app.models.user import User
 from app.services.user import get_user_by_email, verify_password
 
-# will move these to a .env file later, current placeholders
-SECRET_KEY = "a-long-random-string"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 1440))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 

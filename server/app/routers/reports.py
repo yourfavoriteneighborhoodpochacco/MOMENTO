@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from app.services.websocket import manager
 
 from app.db.session import get_db
 from app.schemas.crowd_report import CrowdReportCreate, CrowdReportResponse
@@ -32,5 +33,19 @@ def submit_crowd_report(
     )
 
     recompute_score(db=db, location_id=str(report_data.location_id))
+    
+    new_score = recompute_score(db=db, location_id=str(report_data.location_id))
+
+    import asyncio
+    asyncio.create_task(
+        manager.broadcast_to_location(
+            location_id=str(report_data.location_id),
+            message={
+                "location_id": str(report_data.location_id),
+                "score": new_score,
+                "label": score_to_label(new_score)
+            }
+        )
+    )
 
     return report

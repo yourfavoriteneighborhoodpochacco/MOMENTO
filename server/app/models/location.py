@@ -1,22 +1,22 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from geoalchemy2 import Geometry
 import uuid
 
 from app.db.base import Base
 
 class Location(Base):
     __tablename__ = "locations"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     category = Column(String, nullable=False)
-    coordinates = Column(Geometry("POINT", srid=4326), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
     capacity_estimate = Column(Integer, nullable=False)
     parent_id = Column(UUID(as_uuid=True), nullable=True)
     admin_tag = Column(String, nullable=True)
-    
+
     crowd_reports = relationship("CrowdReport", back_populates="location")
     availability_patterns = relationship("AvailabilityPattern", back_populates="location")
     availability_scores = relationship("AvailabilityScore", back_populates="location")
