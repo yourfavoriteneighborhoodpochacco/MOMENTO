@@ -24,7 +24,14 @@ export default function MomentoMap() {
   }, [])
 
   return (
-    <div style={{ width: "100vw", height: "100vh", position: "relative" }}>
+    <div style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      overflow: "hidden"
+    }}>
       <Map
         {...viewState}
         onMove={e => setViewState(e.viewState)}
@@ -32,7 +39,7 @@ export default function MomentoMap() {
         style={{ width: "100%", height: "100%" }}
         onClick={() => setSelectedLocation(null)}
       >
-        <NavigationControl position="top-right" />
+        <NavigationControl position="bottom-right" />
         {locations.map(location => (
           <LocationMarker
             key={location.id}

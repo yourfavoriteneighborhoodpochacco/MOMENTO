@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react"
 import { Location, AvailabilityScore } from "@/types"
 import { getAvailability } from "@/lib/api"
+import { useWebSocket } from "@/hooks/useWebSocket"
+import { useAuth } from "@/hooks/useAuth"
+import { submitCrowdReport } from "@/lib/api"
+import Link from "next/link"
 
 interface LocationPanelProps {
   location: Location | null
@@ -12,14 +16,31 @@ interface LocationPanelProps {
 const LABEL_COLORS: Record<string, string> = {
   "virtually empty": "#4CAF50",
   "plenty of space": "#8BC34A",
-  "moderate":        "#FFC107",
-  "filling up":      "#FF5722",
-  "virtually full":  "#F44336"
+  "moderate": "#FFC107",
+  "filling up": "#FF5722",
+  "virtually full": "#F44336"
 }
+
 
 export default function LocationPanel({ location, onClose }: LocationPanelProps) {
   const [score, setScore] = useState<AvailabilityScore | null>(null)
   const [loading, setLoading] = useState(false)
+
+  const { user, token } = useAuth()
+  const [seated, setSeated] = useState("")
+  const [line, setLine] = useState("")
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  useWebSocket(location?.id ?? null, (update) => {
+    if (score && update.location_id === location?.id) {
+      setScore(prev => prev ? {
+        ...prev,
+        score: update.score,
+        label: update.label
+      } : prev)
+    }
+  })
 
   useEffect(() => {
     if (!location) {
@@ -238,6 +259,155 @@ export default function LocationPanel({ location, onClose }: LocationPanelProps)
                 </div>
               </div>
 
+              {/* View full detail page */}
+              <Link href={`/locations/${location.id}`} style={{ textDecoration: "none" }}>
+                <div style={{
+                  borderTop: "1px solid #ECEAE4",
+                  paddingTop: 16,
+                  flexShrink: 0
+                }}>
+                  <p style={{
+                    fontSize: 11,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#7A5F55"
+                  }}>
+                    View full details →
+                  </p>
+                </div>
+              </Link>
+
+              {/* Crowd report form — contributors only */}
+              {user?.account_type === "contributor" && (
+                <div style={{
+                  borderTop: "1px solid #ECEAE4",
+                  paddingTop: 16,
+                  flexShrink: 0
+                }}>
+                  <p style={{
+                    fontSize: 10,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "#B0A898",
+                    marginBottom: 14
+                  }}>
+                    Submit report
+                  </p>
+
+                  {submitted ? (
+                    <div style={{
+                      backgroundColor: "#F0EDE8",
+                      borderRadius: 10,
+                      padding: "10px 14px"
+                    }}>
+                      <p style={{ fontSize: 12, color: "#7A5F55" }}>
+                        Report submitted — thanks!
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{
+                            display: "block",
+                            fontSize: 10,
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            color: "#B0A898",
+                            marginBottom: 5
+                          }}>
+                            Seated
+                          </label>
+                          <input
+                            type="number"
+                            value={seated}
+                            onChange={e => setSeated(e.target.value)}
+                            placeholder="0"
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: 8,
+                              border: "1px solid #E0DDD6",
+                              backgroundColor: "#F5F3EF",
+                              fontSize: 13,
+                              color: "#262626",
+                              outline: "none",
+                              boxSizing: "border-box",
+                              fontFamily: "inherit"
+                            }}
+                          />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{
+                            display: "block",
+                            fontSize: 10,
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            color: "#B0A898",
+                            marginBottom: 5
+                          }}>
+                            In line
+                          </label>
+                          <input
+                            type="number"
+                            value={line}
+                            onChange={e => setLine(e.target.value)}
+                            placeholder="0"
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: 8,
+                              border: "1px solid #E0DDD6",
+                              backgroundColor: "#F5F3EF",
+                              fontSize: 13,
+                              color: "#262626",
+                              outline: "none",
+                              boxSizing: "border-box",
+                              fontFamily: "inherit"
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={async () => {
+                          if (!token || !location) return
+                          setSubmitting(true)
+                          try {
+                            await submitCrowdReport({
+                              location_id: location.id,
+                              seated_count: parseInt(seated) || 0,
+                              line_count: parseInt(line) || 0
+                            }, token)
+                            setSubmitted(true)
+                            setTimeout(() => setSubmitted(false), 5000)
+                          } catch {
+                            console.error("Failed to submit report")
+                          } finally {
+                            setSubmitting(false)
+                          }
+                        }}
+                        disabled={submitting}
+                        style={{
+                          width: "100%",
+                          padding: "10px",
+                          borderRadius: 8,
+                          border: "none",
+                          backgroundColor: submitting ? "#C8C4BA" : "#7A5F55",
+                          color: "#ECF0F1",
+                          fontSize: 11,
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                          cursor: submitting ? "not-allowed" : "pointer",
+                          fontFamily: "inherit"
+                        }}
+                      >
+                        {submitting ? "Submitting..." : "Submit"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </>
         )}

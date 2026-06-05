@@ -32,6 +32,7 @@ export default function LoginPage() {
   return (
     <div style={{
       minHeight: "100vh",
+      overflow: "auto",
       backgroundColor: "#ECF0F1",
       display: "flex",
       alignItems: "center",
@@ -44,7 +45,7 @@ export default function LoginPage() {
         backgroundColor: "#FAFAF8",
         borderRadius: 20,
         boxShadow: "0 8px 40px rgba(0,0,0,0.10)",
-        overflow: "hidden"
+        overflow: "auto"
       }}>
 
         {/* Banner */}
