@@ -27,7 +27,7 @@ def seed_locations(db):
         ),
         Location(
             id=uuid.uuid4(),
-            name="Langson Library — Floor 2",
+            name="Langson Library - Floor 2",
             category="study",
             latitude=33.6471,
             longitude=-117.8411,
@@ -37,7 +37,7 @@ def seed_locations(db):
         ),
         Location(
             id=uuid.uuid4(),
-            name="Langson Library — Floor 3 Quiet Zone",
+            name="Langson Library - Floor 3 Quiet Zone",
             category="study",
             latitude=33.6471,
             longitude=-117.8411,
@@ -57,7 +57,7 @@ def seed_locations(db):
         ),
         Location(
             id=uuid.uuid4(),
-            name="Starbucks — Aldrich Park",
+            name="Starbucks - Aldrich Park",
             category="cafe",
             latitude=33.6465,
             longitude=-117.8420,
@@ -67,7 +67,7 @@ def seed_locations(db):
         ),
         Location(
             id=uuid.uuid4(),
-            name="Peet's Coffee — UCI Student Center",
+            name="Peet's Coffee - UCI Student Center",
             category="cafe",
             latitude=33.6497,
             longitude=-117.8428,
