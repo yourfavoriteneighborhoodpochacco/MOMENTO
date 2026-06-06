@@ -278,7 +278,7 @@ export default function LocationPanel({ location, onClose }: LocationPanelProps)
               </Link>
 
               {/* Crowd report form — contributors only */}
-              {user?.account_type === "contributor" && (
+              {(user?.account_type === "contributor" || user?.account_type === "admin") && (
                 <div style={{
                   borderTop: "1px solid #ECEAE4",
                   paddingTop: 16,
