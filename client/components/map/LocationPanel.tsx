@@ -259,24 +259,6 @@ export default function LocationPanel({ location, onClose }: LocationPanelProps)
                 </div>
               </div>
 
-              {/* View full detail page */}
-              <Link href={`/locations/${location.id}`} style={{ textDecoration: "none" }}>
-                <div style={{
-                  borderTop: "1px solid #ECEAE4",
-                  paddingTop: 16,
-                  flexShrink: 0
-                }}>
-                  <p style={{
-                    fontSize: 11,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "#7A5F55"
-                  }}>
-                    View full details →
-                  </p>
-                </div>
-              </Link>
-
               {/* Crowd report form — contributors only */}
               {(user?.account_type === "contributor" || user?.account_type === "admin") && (
                 <div style={{
