@@ -92,7 +92,7 @@ export default function RegisterPage() {
     <div style={{
       minHeight: "100vh",
       overflowY: "auto",
-      backgroundColor: "#ECF0F1",
+      backgroundColor: "#FAFAF8",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
