@@ -314,9 +314,12 @@ export default function ProfilePage() {
                         }}>
                             Contributor
                         </p>
-                        {user.account_type === "contributor" ? (
+                        {user.account_type === "contributor" || user.account_type === "admin" ? (
                             <p style={{ fontSize: 16, color: "#7A5F55", lineHeight: 1.6 }}>
-                                You're an approved contributor. Thank you for helping the community.
+                                {user.account_type === "admin"
+                                    ? "You're an admin. You can manage locations and approve contributors."
+                                    : "You're an approved contributor. Thank you for helping the community."
+                                }
                             </p>
                         ) : user.status === "pending" ? (
                             <p style={{ fontSize: 16, color: "#9C9086", lineHeight: 1.6 }}>

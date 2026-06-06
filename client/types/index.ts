@@ -1,4 +1,4 @@
-export type AccountType = "contributor" | "non-contributor"
+export type AccountType = "contributor" | "non-contributor" | "admin"
 export type UserStatus = "pending" | "approved" | "suspended" | null
 export type AvailabilityLabel =
   | "virtually empty"
