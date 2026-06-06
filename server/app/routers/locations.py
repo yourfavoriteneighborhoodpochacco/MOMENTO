@@ -9,6 +9,8 @@ from app.services.location import (
     get_location_by_id,
     get_sublocations
 )
+from app.models.user import User
+from app.services.auth import get_current_admin
 
 router = APIRouter(prefix="/locations", tags=["locations"])
 
@@ -42,6 +44,7 @@ def list_sublocations(
 @router.post("/", response_model=LocationResponse, status_code=status.HTTP_201_CREATED)
 def add_location(
     location_data: LocationCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_admin)
 ):
     return create_location(db=db, location_data=location_data)
