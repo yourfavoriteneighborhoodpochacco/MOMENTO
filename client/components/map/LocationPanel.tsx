@@ -6,7 +6,6 @@ import { getAvailability } from "@/lib/api"
 import { useWebSocket } from "@/hooks/useWebSocket"
 import { useAuth } from "@/hooks/useAuth"
 import { submitCrowdReport } from "@/lib/api"
-import Link from "next/link"
 
 interface LocationPanelProps {
   location: Location | null
