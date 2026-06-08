@@ -89,7 +89,7 @@ export default function NavBar() {
                                         textTransform: "uppercase",
                                         color: "#7A5F55"
                                     }}>
-                                        Admin
+                                        Dashboard
                                     </span>
                                 </div>
                             </Link>
