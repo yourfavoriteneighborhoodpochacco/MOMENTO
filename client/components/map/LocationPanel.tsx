@@ -13,11 +13,11 @@ interface LocationPanelProps {
 }
 
 const LABEL_COLORS: Record<string, string> = {
-  "virtually empty": "#4CAF50",
-  "plenty of space": "#8BC34A",
-  "moderate": "#FFC107",
-  "filling up": "#FF5722",
-  "virtually full": "#F44336"
+  "virtually empty": "#a0ba93",
+  "plenty of space": "#658058",
+  "moderate": "#9e9470",
+  "filling up": "#a8718b",
+  "virtually full": "#ad4254"
 }
 
 
