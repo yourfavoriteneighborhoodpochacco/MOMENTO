@@ -86,7 +86,7 @@ export default function AdminPage() {
   if (loading || fetching) return (
     <div style={{
       minHeight: "100vh",
-      backgroundColor: "#ECF0F1",
+      backgroundColor: "#FAFAF8",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -99,7 +99,7 @@ export default function AdminPage() {
   return (
     <div style={{
       minHeight: "100vh",
-      backgroundColor: "#ECF0F1",
+      backgroundColor: "#FAFAF8",
       fontFamily: "var(--font-cormorant), Georgia, serif",
       padding: "48px 40px"
     }}>
