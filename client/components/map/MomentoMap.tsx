@@ -13,10 +13,21 @@ const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY
 export default function MomentoMap() {
   const [locations, setLocations] = useState<Location[]>([])
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
-  const [viewState, setViewState] = useState({
-    latitude: 33.6461,
-    longitude: -117.8427,
-    zoom: 15
+  const [viewState, setViewState] = useState(() => {
+    if (typeof window === "undefined") return {
+      latitude: 33.6461,
+      longitude: -117.8427,
+      zoom: 15
+    }
+    const saved = localStorage.getItem("momento_viewport")
+    if (saved) {
+      try { return JSON.parse(saved) } catch { }
+    }
+    return {
+      latitude: 33.6461,
+      longitude: -117.8427,
+      zoom: 15
+    }
   })
 
   useEffect(() => {
@@ -34,7 +45,10 @@ export default function MomentoMap() {
     }}>
       <Map
         {...viewState}
-        onMove={e => setViewState(e.viewState)}
+        onMove={e => {
+          setViewState(e.viewState)
+          localStorage.setItem("momento_viewport", JSON.stringify(e.viewState))
+        }}
         mapStyle={process.env.NEXT_PUBLIC_MAPTILER_STYLE}
         style={{ width: "100%", height: "100%" }}
         onClick={() => setSelectedLocation(null)}
