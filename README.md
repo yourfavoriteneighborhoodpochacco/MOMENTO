@@ -123,7 +123,3 @@ Measured from crowd report submission timestamp to client receipt timestamp. Las
 | Accent | `#7A5F55` |
 | Display font | Cormorant Garamond |
 | Aesthetic | Warm luxury. Creamy. Cozy. |
-
----
-
-Built by Michael — UCI student, learning in public.
