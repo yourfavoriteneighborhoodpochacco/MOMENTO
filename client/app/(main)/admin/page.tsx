@@ -59,6 +59,18 @@ export default function AdminPage() {
     const [locationSuccess, setLocationSuccess] = useState(false)
     const [allLocations, setAllLocations] = useState<any[]>([])
 
+    const [editingLocation, setEditingLocation] = useState<any | null>(null)
+    const [editForm, setEditForm] = useState({
+        name: "",
+        category: "study",
+        latitude: "",
+        longitude: "",
+        capacity_estimate: "",
+        parent_id: "",
+        admin_tag: ""
+    })
+    const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+
     useEffect(() => {
         if (!loading && !user) router.push("/login")
         if (!loading && user?.account_type !== "admin") router.push("/map")
@@ -160,6 +172,52 @@ export default function AdminPage() {
             console.error(e)
         } finally {
             setLocationLoading(false)
+        }
+    }
+
+    async function handleEditLocation() {
+        if (!token || !editingLocation) return
+        setLocationLoading(true)
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/locations/${editingLocation.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: editForm.name,
+                    category: editForm.category,
+                    latitude: parseFloat(editForm.latitude),
+                    longitude: parseFloat(editForm.longitude),
+                    capacity_estimate: parseInt(editForm.capacity_estimate),
+                    parent_id: editForm.parent_id || null,
+                    admin_tag: editForm.admin_tag || null
+                })
+            })
+            if (!res.ok) throw new Error("Failed to update location")
+            const updated = await res.json()
+            setAllLocations(prev => prev.map(l => l.id === updated.id ? updated : l))
+            setEditingLocation(null)
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setLocationLoading(false)
+        }
+    }
+
+    async function handleDeleteLocation(locationId: string) {
+        if (!token) return
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/locations/${locationId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (!res.ok) throw new Error("Failed to delete location")
+            setAllLocations(prev => prev.filter(l => l.id !== locationId))
+            setDeleteConfirm(null)
+        } catch (e) {
+            console.error(e)
         }
     }
 
@@ -631,31 +689,290 @@ export default function AdminPage() {
                 {/* Existing locations list */}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {allLocations.map(loc => (
-                        <div
-                            key={loc.id}
-                            style={{
-                                backgroundColor: "#FAFAF8",
-                                borderRadius: 12,
-                                padding: "14px 20px",
-                                boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center"
-                            }}
-                        >
-                            <div>
-                                <p style={{ fontSize: 14, fontWeight: 500, color: "#262626", marginBottom: 2 }}>
-                                    {loc.name}
-                                </p>
-                                <p style={{ fontSize: 11, color: "#B0A898" }}>
-                                    {loc.category}
-                                    {loc.parent_id && " · sublocation"}
-                                    {loc.admin_tag && ` · ${loc.admin_tag}`}
-                                </p>
-                            </div>
-                            <p style={{ fontSize: 11, color: "#C0B8B0", letterSpacing: "0.04em" }}>
-                                {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}
-                            </p>
+                        <div key={loc.id}>
+                            {editingLocation?.id === loc.id ? (
+                                /* Edit form inline */
+                                <div style={{
+                                    backgroundColor: "#FAFAF8",
+                                    borderRadius: 12,
+                                    padding: "20px",
+                                    boxShadow: "0 2px 12px rgba(0,0,0,0.05)"
+                                }}>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                                        <input
+                                            type="text"
+                                            value={editForm.name}
+                                            onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
+                                            style={{
+                                                width: "100%",
+                                                padding: "10px 14px",
+                                                borderRadius: 10,
+                                                border: "1px solid #E0DDD6",
+                                                backgroundColor: "#F5F3EF",
+                                                fontSize: 14,
+                                                color: "#262626",
+                                                outline: "none",
+                                                boxSizing: "border-box",
+                                                fontFamily: "inherit"
+                                            }}
+                                        />
+                                        <select
+                                            value={editForm.category}
+                                            onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))}
+                                            style={{
+                                                width: "100%",
+                                                padding: "10px 14px",
+                                                borderRadius: 10,
+                                                border: "1px solid #E0DDD6",
+                                                backgroundColor: "#F5F3EF",
+                                                fontSize: 14,
+                                                color: "#262626",
+                                                outline: "none",
+                                                fontFamily: "inherit"
+                                            }}
+                                        >
+                                            <option value="study">Study</option>
+                                            <option value="gym">Gym</option>
+                                            <option value="cafe">Cafe</option>
+                                        </select>
+                                        <div style={{ display: "flex", gap: 12 }}>
+                                            <input
+                                                type="number"
+                                                value={editForm.latitude}
+                                                onChange={e => setEditForm(p => ({ ...p, latitude: e.target.value }))}
+                                                placeholder="Latitude"
+                                                style={{
+                                                    flex: 1,
+                                                    padding: "10px 14px",
+                                                    borderRadius: 10,
+                                                    border: "1px solid #E0DDD6",
+                                                    backgroundColor: "#F5F3EF",
+                                                    fontSize: 14,
+                                                    color: "#262626",
+                                                    outline: "none",
+                                                    fontFamily: "inherit"
+                                                }}
+                                            />
+                                            <input
+                                                type="number"
+                                                value={editForm.longitude}
+                                                onChange={e => setEditForm(p => ({ ...p, longitude: e.target.value }))}
+                                                placeholder="Longitude"
+                                                style={{
+                                                    flex: 1,
+                                                    padding: "10px 14px",
+                                                    borderRadius: 10,
+                                                    border: "1px solid #E0DDD6",
+                                                    backgroundColor: "#F5F3EF",
+                                                    fontSize: 14,
+                                                    color: "#262626",
+                                                    outline: "none",
+                                                    fontFamily: "inherit"
+                                                }}
+                                            />
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={editForm.capacity_estimate}
+                                            onChange={e => setEditForm(p => ({ ...p, capacity_estimate: e.target.value }))}
+                                            placeholder="Capacity"
+                                            style={{
+                                                width: "100%",
+                                                padding: "10px 14px",
+                                                borderRadius: 10,
+                                                border: "1px solid #E0DDD6",
+                                                backgroundColor: "#F5F3EF",
+                                                fontSize: 14,
+                                                color: "#262626",
+                                                outline: "none",
+                                                boxSizing: "border-box",
+                                                fontFamily: "inherit"
+                                            }}
+                                        />
+                                        <select
+                                            value={editForm.admin_tag}
+                                            onChange={e => setEditForm(p => ({ ...p, admin_tag: e.target.value }))}
+                                            style={{
+                                                width: "100%",
+                                                padding: "10px 14px",
+                                                borderRadius: 10,
+                                                border: "1px solid #E0DDD6",
+                                                backgroundColor: "#F5F3EF",
+                                                fontSize: 14,
+                                                color: "#262626",
+                                                outline: "none",
+                                                fontFamily: "inherit"
+                                            }}
+                                        >
+                                            <option value="">No tag</option>
+                                            <option value="usually active">Usually active</option>
+                                            <option value="usually empty">Usually empty</option>
+                                        </select>
+                                        <div style={{ display: "flex", gap: 8 }}>
+                                            <button
+                                                onClick={handleEditLocation}
+                                                disabled={locationLoading}
+                                                style={{
+                                                    flex: 1,
+                                                    padding: "10px",
+                                                    borderRadius: 8,
+                                                    border: "none",
+                                                    backgroundColor: "#7A5F55",
+                                                    color: "#ECF0F1",
+                                                    fontSize: 12,
+                                                    letterSpacing: "0.08em",
+                                                    textTransform: "uppercase",
+                                                    cursor: "pointer",
+                                                    fontFamily: "inherit"
+                                                }}
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={() => setEditingLocation(null)}
+                                                style={{
+                                                    flex: 1,
+                                                    padding: "10px",
+                                                    borderRadius: 8,
+                                                    border: "1px solid #E0DDD6",
+                                                    backgroundColor: "transparent",
+                                                    color: "#9C9086",
+                                                    fontSize: 12,
+                                                    letterSpacing: "0.08em",
+                                                    textTransform: "uppercase",
+                                                    cursor: "pointer",
+                                                    fontFamily: "inherit"
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : deleteConfirm === loc.id ? (
+                                /* Delete confirmation */
+                                <div style={{
+                                    backgroundColor: "#FAFAF8",
+                                    borderRadius: 12,
+                                    padding: "16px 20px",
+                                    boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
+                                    <p style={{ fontSize: 13, color: "#C0786A" }}>
+                                        Delete "{loc.name}"? This cannot be undone.
+                                    </p>
+                                    <div style={{ display: "flex", gap: 8 }}>
+                                        <button
+                                            onClick={() => handleDeleteLocation(loc.id)}
+                                            style={{
+                                                padding: "6px 14px",
+                                                borderRadius: 8,
+                                                border: "none",
+                                                backgroundColor: "#C0786A",
+                                                color: "white",
+                                                fontSize: 11,
+                                                letterSpacing: "0.08em",
+                                                textTransform: "uppercase",
+                                                cursor: "pointer",
+                                                fontFamily: "inherit"
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+                                        <button
+                                            onClick={() => setDeleteConfirm(null)}
+                                            style={{
+                                                padding: "6px 14px",
+                                                borderRadius: 8,
+                                                border: "1px solid #E0DDD6",
+                                                backgroundColor: "transparent",
+                                                color: "#9C9086",
+                                                fontSize: 11,
+                                                letterSpacing: "0.08em",
+                                                textTransform: "uppercase",
+                                                cursor: "pointer",
+                                                fontFamily: "inherit"
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                /* Normal row */
+                                <div style={{
+                                    backgroundColor: "#FAFAF8",
+                                    borderRadius: 12,
+                                    padding: "14px 20px",
+                                    boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
+                                    <div>
+                                        <p style={{ fontSize: 14, fontWeight: 500, color: "#262626", marginBottom: 2 }}>
+                                            {loc.name}
+                                        </p>
+                                        <p style={{ fontSize: 11, color: "#B0A898" }}>
+                                            {loc.category}
+                                            {loc.parent_id && " · sublocation"}
+                                            {loc.admin_tag && ` · ${loc.admin_tag}`}
+                                        </p>
+                                    </div>
+                                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                                        <p style={{ fontSize: 11, color: "#C0B8B0", marginRight: 8 }}>
+                                            {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}
+                                        </p>
+                                        <button
+                                            onClick={() => {
+                                                setEditingLocation(loc)
+                                                setEditForm({
+                                                    name: loc.name,
+                                                    category: loc.category,
+                                                    latitude: String(loc.latitude),
+                                                    longitude: String(loc.longitude),
+                                                    capacity_estimate: String(loc.capacity_estimate),
+                                                    parent_id: loc.parent_id || "",
+                                                    admin_tag: loc.admin_tag || ""
+                                                })
+                                            }}
+                                            style={{
+                                                padding: "6px 12px",
+                                                borderRadius: 8,
+                                                border: "1px solid #E0DDD6",
+                                                backgroundColor: "transparent",
+                                                color: "#7A5F55",
+                                                fontSize: 11,
+                                                letterSpacing: "0.08em",
+                                                textTransform: "uppercase",
+                                                cursor: "pointer",
+                                                fontFamily: "inherit"
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => setDeleteConfirm(loc.id)}
+                                            style={{
+                                                padding: "6px 12px",
+                                                borderRadius: 8,
+                                                border: "1px solid #E0DDD6",
+                                                backgroundColor: "transparent",
+                                                color: "#C0786A",
+                                                fontSize: 11,
+                                                letterSpacing: "0.08em",
+                                                textTransform: "uppercase",
+                                                cursor: "pointer",
+                                                fontFamily: "inherit"
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
